@@ -39,6 +39,7 @@ export class Preloader extends Scene {
             frameWidth: 1080,
             frameHeight: 1080,
         });
+        this.load.audio("explosion", "imported/explosion-sound.mp3");
     }
 
     create() {

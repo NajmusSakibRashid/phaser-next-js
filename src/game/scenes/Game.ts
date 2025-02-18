@@ -90,6 +90,7 @@ export class Game extends Scene {
                                     .sprite(building.x, building.y, "explosion")
                                     .setDisplaySize(40, 40)
                                     .play("explosion");
+                                this.sound.play("explosion");
                                 building.destroy();
                                 // Handle collision here
                             }
