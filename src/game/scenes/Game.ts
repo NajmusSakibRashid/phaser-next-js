@@ -85,13 +85,13 @@ export class Game extends Scene {
                                     building.getBounds()
                                 )
                             ) {
-                                // console.log("Collision detected!");
                                 this.add
                                     .sprite(building.x, building.y, "explosion")
                                     .setDisplaySize(40, 40)
                                     .play("explosion");
-                                this.sound.play("explosion");
+                                this.sound.add("explosion-sound").play();
                                 building.destroy();
+                                this.tweens.killTweensOf(building);
                                 // Handle collision here
                             }
 
