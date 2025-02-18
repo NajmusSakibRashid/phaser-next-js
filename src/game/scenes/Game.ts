@@ -1,3 +1,4 @@
+import build from "next/dist/build";
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 
@@ -20,7 +21,7 @@ export class Game extends Scene {
         console.log("cols", cols);
         console.log("rows", rows);
 
-        const background = this.add
+        this.background = this.add
             .image(0, 0, "background")
             .setOrigin(0)
             .setDisplaySize(this.scale.width, this.scale.height)
@@ -42,6 +43,71 @@ export class Game extends Scene {
             .setAngle(-20);
 
         const group = this.add.group([arm, body, bucket]);
+
+        this.anims.create({
+            key: "explosion",
+            frames: this.anims.generateFrameNumbers("explosion"),
+            frameRate: 22,
+            repeat: 0,
+            hideOnComplete: true,
+        });
+
+        const foo = () => {
+            setTimeout(() => {
+                const arr = [0, 48 - 4, 96];
+                const building = this.add
+                    .image(
+                        this.scale.width,
+                        384 - arr[Math.floor(Math.random() * 3)],
+                        "building"
+                    )
+                    .setDisplaySize(40, 40);
+
+                this.tweens.add({
+                    targets: building,
+                    x: -building.displayWidth,
+                    ease: "Linear",
+                    duration: 5000,
+                    repeat: 0,
+                    onUpdate: () => {
+                        if (
+                            Phaser.Geom.Intersects.RectangleToRectangle(
+                                bucket.getBounds(),
+                                building.getBounds()
+                            )
+                        ) {
+                            const bucketMask = bucket.createBitmapMask();
+                            const buildingMask = building.createBitmapMask();
+
+                            if (
+                                Phaser.Geom.Intersects.RectangleToRectangle(
+                                    bucket.getBounds(),
+                                    building.getBounds()
+                                )
+                            ) {
+                                // console.log("Collision detected!");
+                                this.add
+                                    .sprite(building.x, building.y, "explosion")
+                                    .setDisplaySize(40, 40)
+                                    .play("explosion");
+                                building.destroy();
+                                // Handle collision here
+                            }
+
+                            bucketMask.destroy();
+                            buildingMask.destroy();
+                        }
+                    },
+                    onComplete: () => {
+                        building.destroy();
+                    },
+                });
+
+                foo();
+            }, Math.random() * 4000 + 1000);
+        };
+
+        foo();
 
         group.setX(160);
 
@@ -112,6 +178,8 @@ export class Game extends Scene {
         //             .setFillStyle(0xffffff, 0); // Set fill color to transparent
         //     }
         // }
+
+        //[0,48,96]
 
         EventBus.emit("current-scene-ready", this);
     }
