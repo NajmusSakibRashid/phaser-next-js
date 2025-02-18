@@ -44,6 +44,8 @@ export class Game extends Scene {
 
         const group = this.add.group([arm, body, bucket]);
 
+        group.setDepth(10);
+
         this.anims.create({
             key: "explosion",
             frames: this.anims.generateFrameNumbers("explosion"),
@@ -61,7 +63,8 @@ export class Game extends Scene {
                         384 - arr[Math.floor(Math.random() * 3)],
                         "building"
                     )
-                    .setDisplaySize(40, 40);
+                    .setDisplaySize(40, 40)
+                    .setDepth(1);
 
                 this.tweens.add({
                     targets: building,
@@ -89,7 +92,9 @@ export class Game extends Scene {
                                     .sprite(building.x, building.y, "explosion")
                                     .setDisplaySize(40, 40)
                                     .play("explosion");
-                                this.sound.add("explosion-sound").play();
+                                this.sound
+                                    .add("explosion-sound", { volume: 0.1 })
+                                    .play();
                                 building.destroy();
                                 this.tweens.killTweensOf(building);
                                 // Handle collision here
