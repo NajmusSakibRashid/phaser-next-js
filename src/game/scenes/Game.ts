@@ -162,44 +162,25 @@ export class Game extends Scene {
                                     .add("explosion-sound", { volume: 0.05 })
                                     .play();
                                 building.destroy();
+                                updatePoints(1);
                                 this.tweens.killTweensOf(building);
                                 // Handle collision here
                             }
 
                             bucketMask.destroy();
                             buildingMask.destroy();
-                        } else if (
-                            Phaser.Geom.Intersects.RectangleToRectangle(
-                                body.getBounds(),
-                                building.getBounds()
-                            )
-                        ) {
-                            // Handle collision here
-                            building.setData("damaged", true);
-                            // if (currentHealth > 0) {
-                            //     currentHealth -= 5e-1;
-                            //     drawHealthBar();
-                            //     building.setData("damaged", true);
-                            // } else {
-                            //     this.changeScene();
-                            //     building.destroy();
-                            //     this.tweens.killTweensOf(building);
-                            // }
                         }
                     },
                     onComplete: () => {
-                        if (building.getData("damaged")) {
+                        if (currentHealth > 0) {
+                            currentHealth -= 25;
+                            drawHealthBar();
+                            this.cameras.main.shake(500, 0.01);
                             this.sound
                                 .add("despicable-sound", { volume: 0.25 })
                                 .play();
-
-                            this.cameras.main.shake(500, 0.01);
-                            if (currentHealth > 0) {
-                                currentHealth -= 25;
-                                drawHealthBar();
-                            } else {
-                                this.changeScene();
-                            }
+                        } else {
+                            this.changeScene();
                         }
                         building.destroy();
                     },
@@ -310,6 +291,26 @@ export class Game extends Scene {
         };
 
         drawHealthBar();
+
+        const pointsText = this.add
+            .text(20, 50, "Points: 0", {
+                fontFamily: "Arial",
+                fontSize: "24px",
+                color: "#ffffff",
+                stroke: "#000000",
+                strokeThickness: 4,
+            })
+            .setDepth(100);
+
+        let points = 0;
+
+        const updatePoints = (value: number) => {
+            points += value;
+            pointsText.setText(`Points: ${points}`);
+        };
+
+        // Example of how to update points
+        // updatePoints(10);
 
         EventBus.emit("current-scene-ready", this);
 
