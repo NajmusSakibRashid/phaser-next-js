@@ -59,11 +59,14 @@ export class Game extends Scene {
         const roadWidth = road.displayWidth;
         road.setX(0);
 
+        const roadSpeed = 500; // pixels per second
+        const roadDuration = (roadWidth / roadSpeed) * 1000;
+
         this.tweens.add({
             targets: road,
             x: -roadWidth,
             ease: "Linear",
-            duration: 5000,
+            duration: roadDuration,
             repeat: -1,
             onRepeat: () => {
                 road.x = 0;
@@ -78,7 +81,7 @@ export class Game extends Scene {
             targets: road2,
             x: 0,
             ease: "Linear",
-            duration: 5000,
+            duration: roadDuration,
             repeat: -1,
             onRepeat: () => {
                 road2.x = roadWidth;
@@ -122,11 +125,17 @@ export class Game extends Scene {
                     .setDisplaySize(100, 100)
                     .setDepth(5);
 
+                const buildingSpeed = 500; // pixels per second
+                const buildingDuration =
+                    ((this.scale.width + building.displayWidth) /
+                        buildingSpeed) *
+                    1000;
+
                 this.tweens.add({
                     targets: building,
                     x: -building.displayWidth,
                     ease: "Linear",
-                    duration: 2750,
+                    duration: buildingDuration,
                     repeat: 0,
                     onUpdate: () => {
                         if (
@@ -150,7 +159,7 @@ export class Game extends Scene {
                                     .play("explosion")
                                     .setDepth(15);
                                 this.sound
-                                    .add("explosion-sound", { volume: 0.1 })
+                                    .add("explosion-sound", { volume: 0.05 })
                                     .play();
                                 building.destroy();
                                 this.tweens.killTweensOf(building);
@@ -159,18 +168,68 @@ export class Game extends Scene {
 
                             bucketMask.destroy();
                             buildingMask.destroy();
+                        } else if (
+                            Phaser.Geom.Intersects.RectangleToRectangle(
+                                body.getBounds(),
+                                building.getBounds()
+                            )
+                        ) {
+                            // Handle collision here
+                            if (currentHealth > 0) {
+                                currentHealth -= 5e-1;
+                                drawHealthBar();
+                                building.setData("damaged", true);
+                            } else {
+                                this.changeScene();
+                                building.destroy();
+                                this.tweens.killTweensOf(building);
+                            }
                         }
                     },
                     onComplete: () => {
+                        if (building.getData("damaged")) {
+                            this.sound
+                                .add("despicable-sound", { volume: 0.25 })
+                                .play();
+                        }
                         building.destroy();
                     },
                 });
-
                 foo();
             }, Math.random() * 4000 + 1500);
         };
 
-        foo();
+        const random_sounds = [
+            "joy-bangla",
+            "bongoboltu",
+            "kemon-achen",
+            "thakbena",
+        ];
+
+        const random_sound = () => {
+            setTimeout(() => {
+                this.sound
+                    .add(
+                        random_sounds[
+                            Math.floor(Math.random() * random_sounds.length)
+                        ],
+                        { volume: 0.25 }
+                    )
+                    .play();
+                random_sound();
+            }, Math.random() * 10000 + 5000);
+        };
+
+        const buldozerSound = this.sound.add("buldozer-sound", {
+            volume: 0.25,
+        });
+        buldozerSound.play();
+        buldozerSound.on("complete", () => {
+            foo();
+            random_sound();
+        });
+
+        // foo();
 
         group.setX(160);
 
@@ -212,78 +271,36 @@ export class Game extends Scene {
             }
         });
 
-        this.input.keyboard?.on("keydown-RIGHT", () => {
-            if (
-                group
-                    .getChildren()
-                    .some(
-                        (child) =>
-                            (child as Phaser.GameObjects.Image).x +
-                                (child as Phaser.GameObjects.Image)
-                                    .displayWidth +
-                                80 <
-                            this.scale.width
-                    )
-            ) {
-                group.incX(16);
-            }
-        });
-
-        this.input.keyboard?.on("keydown-LEFT", () => {
-            if (
-                group
-                    .getChildren()
-                    .some(
-                        (child) =>
-                            (child as Phaser.GameObjects.Image).x > 0 + 40
-                    )
-            ) {
-                group.incX(-16);
-            }
-        });
-
         const instructionText = this.add
             .text(
                 this.scale.width - 20,
                 20,
-                "Press space bar or tap on the screen to strike",
+                "Press space bar or\n tap on the screen to strike",
                 {
                     fontFamily: "Arial",
                     fontSize: "24px",
                     color: "#ffffff",
                     stroke: "#000000",
                     strokeThickness: 4,
-                    align: "right",
+                    align: "center",
                 }
             )
             .setOrigin(1, 0)
             .setDepth(100);
 
-        // this.background.setAlpha(0.5);
+        const healthBar = this.add.graphics();
+        const maxHealth = 100;
+        let currentHealth = maxHealth;
 
-        // this.gameText = this.add
-        //     .text(512, this.background.height, "Let's make a buldozer game.", {
-        //         fontFamily: "Arial Black",
-        //         fontSize: 38,
-        //         color: "#ffffff",
-        //         stroke: "#000000",
-        //         strokeThickness: 8,
-        //         align: "center",
-        //     })
-        //     .setOrigin(0.5)
-        //     .setDepth(100);
+        const drawHealthBar = () => {
+            healthBar.clear();
+            healthBar.fillStyle(0xff0000, 1);
+            healthBar.fillRect(20, 20, 200 * (currentHealth / maxHealth), 20);
+            healthBar.lineStyle(2, 0xffffff, 1);
+            healthBar.strokeRect(20, 20, 200, 20);
+        };
 
-        // for (let i = 0; i < cols; i++) {
-        //     for (let j = 0; j < rows; j++) {
-        //         this.add
-        //             .rectangle(i * gridSize, j * gridSize, gridSize, gridSize)
-        //             .setOrigin(0)
-        //             .setStrokeStyle(1, 0xffffff, 1) // Set border color to white
-        //             .setFillStyle(0xffffff, 0); // Set fill color to transparent
-        //     }
-        // }
-
-        //[0,48,96]
+        drawHealthBar();
 
         EventBus.emit("current-scene-ready", this);
 
