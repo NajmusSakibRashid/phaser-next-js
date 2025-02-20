@@ -242,6 +242,23 @@ export class Game extends Scene {
             }
         });
 
+        const instructionText = this.add
+            .text(
+                this.scale.width - 20,
+                20,
+                "Press space bar or tap on the screen to strike",
+                {
+                    fontFamily: "Arial",
+                    fontSize: "24px",
+                    color: "#ffffff",
+                    stroke: "#000000",
+                    strokeThickness: 4,
+                    align: "right",
+                }
+            )
+            .setOrigin(1, 0)
+            .setDepth(100);
+
         // this.background.setAlpha(0.5);
 
         // this.gameText = this.add
