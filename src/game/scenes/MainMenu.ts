@@ -17,24 +17,24 @@ export class MainMenu extends Scene {
             .image(0, 0, "background-original")
             .setOrigin(0);
 
-        this.logo = this.add
-            .image(512, 300, "logo")
-            .setDisplaySize(300, 300)
-            .setDepth(100);
+        this.logo = this.add.image(512, 300, "logo").setDisplaySize(300, 300);
+
+        const fontSize = this.scale.width < 768 ? 24 : 38;
+        const xPos = this.scale.width / 2;
+        const yPos = this.scale.height / 2 + 160;
 
         this.title = this.add
-            .text(512, 460, "Start Game", {
+            .text(xPos, yPos, "Start Game", {
                 fontFamily: "Arial Black",
-                fontSize: 38,
+                fontSize: fontSize,
                 color: "#ffffff",
                 stroke: "#000000",
                 strokeThickness: 8,
                 align: "center",
             })
-            .setOrigin(0.5)
-            .setDepth(100)
-            .on("pointerdown", this.changeScene, this)
-            .setInteractive();
+            .setOrigin(0.5);
+
+        this.input.on("pointerdown", this.changeScene, this);
 
         EventBus.emit("current-scene-ready", this);
     }

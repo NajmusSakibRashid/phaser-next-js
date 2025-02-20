@@ -175,15 +175,16 @@ export class Game extends Scene {
                             )
                         ) {
                             // Handle collision here
-                            if (currentHealth > 0) {
-                                currentHealth -= 5e-1;
-                                drawHealthBar();
-                                building.setData("damaged", true);
-                            } else {
-                                this.changeScene();
-                                building.destroy();
-                                this.tweens.killTweensOf(building);
-                            }
+                            building.setData("damaged", true);
+                            // if (currentHealth > 0) {
+                            //     currentHealth -= 5e-1;
+                            //     drawHealthBar();
+                            //     building.setData("damaged", true);
+                            // } else {
+                            //     this.changeScene();
+                            //     building.destroy();
+                            //     this.tweens.killTweensOf(building);
+                            // }
                         }
                     },
                     onComplete: () => {
@@ -191,6 +192,14 @@ export class Game extends Scene {
                             this.sound
                                 .add("despicable-sound", { volume: 0.25 })
                                 .play();
+
+                            this.cameras.main.shake(500, 0.01);
+                            if (currentHealth > 0) {
+                                currentHealth -= 25;
+                                drawHealthBar();
+                            } else {
+                                this.changeScene();
+                            }
                         }
                         building.destroy();
                     },
