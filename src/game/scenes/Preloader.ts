@@ -34,15 +34,19 @@ export class Preloader extends Scene {
         this.load.image("arm", "imported/excavator-arm.png");
         this.load.image("bucket", "imported/excavator-bucket.png");
         this.load.image("building", "imported/building.png");
-        this.load.image(
-            "background_building",
-            "imported/background_building.png"
-        );
+        // this.load.image(
+        //     "background_building",
+        //     "imported/background_building.png"
+        // );
         this.load.image("road", "imported/road.png");
-        this.load.spritesheet("explosion", "imported/explosion-sprite.png", {
-            frameWidth: 1080,
-            frameHeight: 1080,
-        });
+        this.load.spritesheet(
+            "explosion",
+            "imported/explosion-sprite-resized.png",
+            {
+                frameWidth: 108,
+                frameHeight: 108,
+            }
+        );
         this.load.audio("explosion-sound", "imported/explosion-sound.mp3");
     }
 
