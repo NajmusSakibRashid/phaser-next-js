@@ -10,9 +10,8 @@ export class Preloader extends Scene {
         // this.add.image(512, 384, "background");
 
         const background = this.add
-            .image(0, 0, "background")
-            .setOrigin(0)
-            .setDisplaySize(this.scale.width, this.scale.height);
+            .image(0, 0, "background-original")
+            .setOrigin(0);
 
         //  A simple progress bar. This is the outline of the bar.
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
@@ -35,6 +34,11 @@ export class Preloader extends Scene {
         this.load.image("arm", "imported/excavator-arm.png");
         this.load.image("bucket", "imported/excavator-bucket.png");
         this.load.image("building", "imported/building.png");
+        this.load.image(
+            "background_building",
+            "imported/background_building.png"
+        );
+        this.load.image("road", "imported/road.png");
         this.load.spritesheet("explosion", "imported/explosion-sprite.png", {
             frameWidth: 1080,
             frameHeight: 1080,

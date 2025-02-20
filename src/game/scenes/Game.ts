@@ -21,26 +21,86 @@ export class Game extends Scene {
         console.log("cols", cols);
         console.log("rows", rows);
 
-        this.background = this.add
-            .image(0, 0, "background")
-            .setOrigin(0)
-            .setDisplaySize(this.scale.width, this.scale.height)
-            .setAlpha(0.2);
+        this.background = this.add.image(0, 0, "background").setOrigin(0);
+
+        const backgroundWidth = this.background.displayWidth;
+        this.background.setX(0);
+
+        this.tweens.add({
+            targets: this.background,
+            x: -backgroundWidth,
+            ease: "Linear",
+            duration: 30000,
+            repeat: -1,
+            onRepeat: () => {
+                this.background.x = 0;
+            },
+        });
+
+        const background2 = this.add
+            .image(backgroundWidth, 0, "background")
+            .setOrigin(0);
+
+        this.tweens.add({
+            targets: background2,
+            x: 0,
+            ease: "Linear",
+            duration: 30000,
+            repeat: -1,
+            onRepeat: () => {
+                background2.x = backgroundWidth;
+            },
+        });
+
+        const road = this.add
+            .image(0, this.background.height, "road")
+            .setOrigin(0);
+
+        const roadWidth = road.displayWidth;
+        road.setX(0);
+
+        this.tweens.add({
+            targets: road,
+            x: -roadWidth,
+            ease: "Linear",
+            duration: 5000,
+            repeat: -1,
+            onRepeat: () => {
+                road.x = 0;
+            },
+        });
+
+        const road2 = this.add
+            .image(roadWidth, this.background.height, "road")
+            .setOrigin(0);
+
+        this.tweens.add({
+            targets: road2,
+            x: 0,
+            ease: "Linear",
+            duration: 5000,
+            repeat: -1,
+            onRepeat: () => {
+                road2.x = roadWidth;
+            },
+        });
 
         const arm = this.add
-            .image(512 - 8, 384 - 16, "arm")
+            .image(512 - 8, this.background.height - 16, "arm")
             .setDisplaySize(150, 150)
             .setOrigin(0.2, 0.5)
             .setFlipX(true)
-            .setAngle(-20);
+            .setAngle(-20 - 60);
 
-        const body = this.add.image(512, 384, "body").setDisplaySize(75, 75);
+        const body = this.add
+            .image(512, this.background.height, "body")
+            .setDisplaySize(75, 75);
 
         const bucket = this.add
-            .image(512 - 8, 384 - 16, "bucket")
+            .image(512 - 8, this.background.height - 16, "bucket")
             .setDisplaySize(32, 32)
             .setOrigin(-2, -1)
-            .setAngle(-20);
+            .setAngle(-20 - 60);
 
         const group = this.add.group([arm, body, bucket]);
 
@@ -58,19 +118,15 @@ export class Game extends Scene {
             setTimeout(() => {
                 const arr = [0, 48 - 4, 96];
                 const building = this.add
-                    .image(
-                        this.scale.width,
-                        384 - arr[Math.floor(Math.random() * 3)],
-                        "building"
-                    )
-                    .setDisplaySize(40, 40)
-                    .setDepth(1);
+                    .image(this.scale.width, this.background.height, "building")
+                    .setDisplaySize(100, 100)
+                    .setDepth(5);
 
                 this.tweens.add({
                     targets: building,
                     x: -building.displayWidth,
                     ease: "Linear",
-                    duration: 5000,
+                    duration: 2750,
                     repeat: 0,
                     onUpdate: () => {
                         if (
@@ -90,8 +146,9 @@ export class Game extends Scene {
                             ) {
                                 this.add
                                     .sprite(building.x, building.y, "explosion")
-                                    .setDisplaySize(40, 40)
-                                    .play("explosion");
+                                    .setDisplaySize(100, 100)
+                                    .play("explosion")
+                                    .setDepth(15);
                                 this.sound
                                     .add("explosion-sound", { volume: 0.1 })
                                     .play();
@@ -110,24 +167,30 @@ export class Game extends Scene {
                 });
 
                 foo();
-            }, Math.random() * 4000 + 1000);
+            }, Math.random() * 4000 + 1500);
         };
 
         foo();
 
         group.setX(160);
 
-        this.input.keyboard?.on("keydown-UP", () => {
-            if (arm.angle > -30 - 20) {
-                arm.angle -= 30;
-                bucket.angle -= 30;
-            }
-        });
+        let spaceKeyPressed = false;
 
-        this.input.keyboard?.on("keydown-DOWN", () => {
-            if (arm.angle < 0 - 20) {
-                arm.angle += 30;
-                bucket.angle += 30;
+        this.input.keyboard?.on("keydown-SPACE", () => {
+            if (!spaceKeyPressed) {
+                spaceKeyPressed = true;
+                this.tweens.add({
+                    targets: [arm, bucket],
+                    angle: -20,
+                    duration: 250,
+                    yoyo: true,
+                    ease: "Sine.easeInOut",
+                    onComplete: () => {
+                        setTimeout(() => {
+                            spaceKeyPressed = false;
+                        }, 750);
+                    },
+                });
             }
         });
 
@@ -164,7 +227,7 @@ export class Game extends Scene {
         // this.background.setAlpha(0.5);
 
         // this.gameText = this.add
-        //     .text(512, 384, "Let's make a buldozer game.", {
+        //     .text(512, this.background.height, "Let's make a buldozer game.", {
         //         fontFamily: "Arial Black",
         //         fontSize: 38,
         //         color: "#ffffff",
@@ -188,6 +251,8 @@ export class Game extends Scene {
         //[0,48,96]
 
         EventBus.emit("current-scene-ready", this);
+
+        console.log(this.background.height + road.height);
     }
 
     changeScene() {
