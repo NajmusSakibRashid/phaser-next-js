@@ -176,6 +176,24 @@ export class Game extends Scene {
 
         let spaceKeyPressed = false;
 
+        this.input.on("pointerdown", () => {
+            if (!spaceKeyPressed) {
+                spaceKeyPressed = true;
+                this.tweens.add({
+                    targets: [arm, bucket],
+                    angle: -20,
+                    duration: 250,
+                    yoyo: true,
+                    ease: "Sine.easeInOut",
+                    onComplete: () => {
+                        setTimeout(() => {
+                            spaceKeyPressed = false;
+                        }, 750);
+                    },
+                });
+            }
+        });
+
         this.input.keyboard?.on("keydown-SPACE", () => {
             if (!spaceKeyPressed) {
                 spaceKeyPressed = true;
