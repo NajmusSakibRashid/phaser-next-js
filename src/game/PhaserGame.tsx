@@ -1,4 +1,10 @@
-import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import {
+    forwardRef,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 import StartGame from "./main";
 import { EventBus } from "./EventBus";
 
@@ -15,10 +21,28 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
     function PhaserGame({ currentActiveScene }, ref) {
         const game = useRef<Phaser.Game | null>(null!);
 
+        const resizer = () => {
+            if (game.current) {
+                let { innerWidth, innerHeight } = window;
+                let { width, height } = game.current.scale;
+                if (innerWidth < 640) {
+                    const k = 1.5;
+                    game.current.scale.resize(innerHeight * k, height);
+                    setYScale(innerWidth / height);
+                    setXScale(1 / k);
+                } else {
+                    game.current.scale.resize(innerWidth, height);
+                    setXScale(1);
+                    setYScale(innerHeight / height);
+                }
+            }
+        };
+
         useLayoutEffect(() => {
             if (game.current === null) {
                 game.current = StartGame("game-container");
-
+                resizer();
+                window.addEventListener("resize", resizer);
                 if (typeof ref === "function") {
                     ref({ game: game.current, scene: null });
                 } else if (ref) {
@@ -62,10 +86,17 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
             };
         }, [currentActiveScene, ref]);
 
+        const [xScale, setXScale] = useState(1);
+        const [yScale, setYScale] = useState(1);
+
         return (
             <div
                 id="game-container"
-                className="rotate-90 scale-50 sm:rotate-0 sm:scale-100"
+                className="rotate-90 sm:rotate-0"
+                style={{
+                    transform: `scale(${xScale}, ${yScale})`,
+                    transformOrigin: "center",
+                }}
             ></div>
         );
     }

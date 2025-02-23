@@ -17,7 +17,9 @@ export class MainMenu extends Scene {
             .image(0, 0, "background-original")
             .setOrigin(0);
 
-        this.logo = this.add.image(512, 300, "logo").setDisplaySize(300, 300);
+        this.logo = this.add
+            .image(this.scale.width / 2, 300, "logo")
+            .setDisplaySize(300, 300);
 
         const fontSize = this.scale.width < 768 ? 24 : 38;
         const xPos = this.scale.width / 2;

@@ -25,7 +25,7 @@ export class GameOver extends Scene {
         this.background_music.play();
 
         this.gameOverText = this.add
-            .text(512, 384, "Game Over", {
+            .text(this.scale.width / 2, 384, "Game Over", {
                 fontFamily: "Arial Black",
                 fontSize: 64,
                 color: "#ffffff",
@@ -37,14 +37,19 @@ export class GameOver extends Scene {
             .setDepth(100);
 
         this.add
-            .text(512, 384 + 64, "Click to return to the main menu", {
-                fontFamily: "Arial Black",
-                fontSize: 32,
-                color: "#ffffff",
-                stroke: "#000000",
-                strokeThickness: 8,
-                align: "center",
-            })
+            .text(
+                this.scale.width / 2,
+                384 + 64,
+                "Click to return to the main menu",
+                {
+                    fontFamily: "Arial Black",
+                    fontSize: 32,
+                    color: "#ffffff",
+                    stroke: "#000000",
+                    strokeThickness: 8,
+                    align: "center",
+                }
+            )
             .setOrigin(0.5)
             .setDepth(100);
         this.input.on("pointerdown", this.changeScene, this);

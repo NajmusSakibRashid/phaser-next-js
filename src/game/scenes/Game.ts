@@ -88,21 +88,24 @@ export class Game extends Scene {
             },
         });
 
+        const buldozerScale = 2;
+
         const arm = this.add
-            .image(512 - 8, this.background.height - 16, "arm")
-            .setDisplaySize(150, 150)
+            .image(0, this.background.height - 48, "arm")
+            .setDisplaySize(150 * buldozerScale, 150 * buldozerScale)
             .setOrigin(0.2, 0.5)
             .setFlipX(true)
             .setAngle(-20 - 60);
 
         const body = this.add
-            .image(512, this.background.height, "body")
-            .setDisplaySize(75, 75);
+            .image(0, this.background.height, "body")
+            .setDisplaySize(75 * buldozerScale, 75 * buldozerScale)
+            .setOrigin(0.35, 0.5);
 
         const bucket = this.add
-            .image(512 - 8, this.background.height - 16, "bucket")
-            .setDisplaySize(32, 32)
-            .setOrigin(-2, -1)
+            .image(0 - 8, this.background.height - 16, "bucket")
+            .setDisplaySize(32 * buldozerScale, 32 * buldozerScale)
+            .setOrigin(-2 - 0.575, -1)
             .setAngle(-20 - 60);
 
         const group = this.add.group([arm, body, bucket]);
@@ -122,7 +125,7 @@ export class Game extends Scene {
                 const arr = [0, 48 - 4, 96];
                 const building = this.add
                     .image(this.scale.width, this.background.height, "building")
-                    .setDisplaySize(100, 100)
+                    .setDisplaySize(288, 288)
                     .setDepth(5);
 
                 const buildingSpeed = 500; // pixels per second
@@ -131,7 +134,7 @@ export class Game extends Scene {
                         buildingSpeed) *
                     1000;
 
-                this.tweens.add({
+                const buildingTween = this.tweens.add({
                     targets: building,
                     x: -building.displayWidth,
                     ease: "Linear",
@@ -139,6 +142,36 @@ export class Game extends Scene {
                     repeat: 0,
                     onUpdate: () => {
                         if (
+                            Phaser.Geom.Intersects.RectangleToRectangle(
+                                body.getBounds(),
+                                building.getBounds()
+                            )
+                        ) {
+                            const bodyMask = body.createBitmapMask();
+                            const buildingMask = building.createBitmapMask();
+
+                            if (
+                                Phaser.Geom.Intersects.RectangleToRectangle(
+                                    body.getBounds(),
+                                    building.getBounds()
+                                )
+                            ) {
+                                if (currentHealth > 0) {
+                                    currentHealth -= 25;
+                                    drawHealthBar();
+                                    this.cameras.main.shake(500, 0.01);
+                                    this.sound
+                                        .add("despicable-sound", {
+                                            volume: 0.25,
+                                        })
+                                        .play();
+                                }
+                                buildingTween.setCallback("onUpdate", () => {});
+                            }
+
+                            bodyMask.destroy();
+                            buildingMask.destroy();
+                        } else if (
                             Phaser.Geom.Intersects.RectangleToRectangle(
                                 bucket.getBounds(),
                                 building.getBounds()
@@ -172,14 +205,7 @@ export class Game extends Scene {
                         }
                     },
                     onComplete: () => {
-                        if (currentHealth > 0) {
-                            currentHealth -= 25;
-                            drawHealthBar();
-                            this.cameras.main.shake(500, 0.01);
-                            this.sound
-                                .add("despicable-sound", { volume: 0.25 })
-                                .play();
-                        } else {
+                        if (currentHealth == 0) {
                             this.changeScene();
                         }
                         building.destroy();
