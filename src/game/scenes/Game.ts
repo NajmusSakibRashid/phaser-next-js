@@ -186,9 +186,9 @@ export class Game extends Scene {
                                     building.getBounds()
                                 )
                             ) {
-                                this.add
+                                const explosion = this.add
                                     .sprite(building.x, building.y, "explosion")
-                                    .setDisplaySize(100, 100)
+                                    .setDisplaySize(256, 256)
                                     .play("explosion")
                                     .setDepth(15);
                                 this.sound
@@ -196,7 +196,9 @@ export class Game extends Scene {
                                     .play();
                                 building.destroy();
                                 updatePoints(1);
-                                this.tweens.killTweensOf(building);
+                                // this.tweens.killTweensOf(building);
+                                buildingTween.targets = [explosion];
+                                buildingTween.setCallback("onUpdate", () => {});
                                 // Handle collision here
                             }
 
