@@ -92,7 +92,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
         return (
             <div
                 id="game-container"
-                className="rotate-90 sm:rotate-0"
+                className="rotate-90 sm:rotate-0 border-8 border-red-500"
                 style={{
                     transform: `scale(${xScale}, ${yScale})`,
                     transformOrigin: "center",
